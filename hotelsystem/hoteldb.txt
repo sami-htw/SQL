@@ -1,0 +1,187 @@
+DROP TABLE Gast CASCADE;
+DROP TABLE Hotel CASCADE;
+DROP TABLE Abteilung CASCADE;
+DROP TABLE Reservierung;
+DROP TABLE Mitarbeiter;
+DROP TABLE belegt;
+DROP TABLE Hotel_hat_Abteilung;
+DROP TABLE Zimmer;
+
+
+CREATE TABLE Gast(
+  ID SERIAL,
+  Name VARCHAR(20),
+  Vorname VARCHAR(20),
+  Adresse VARCHAR(50),
+  Mobil varchar(20),
+  PRIMARY KEY (ID)
+);
+CREATE TABLE Abteilung(
+  ID SERIAL,
+  Name VARCHAR(20),
+  PRIMARY KEY (ID)
+);
+
+CREATE TABLE Mitarbeiter(
+  ID SERIAL,
+  Name VARCHAR(20),
+  Vorname VARCHAR(20),
+  Adresse VARCHAR(50),
+  Mobil varchar(20),
+  Position varchar(20),
+  AbteilungID INT,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (AbteilungID) REFERENCES Abteilung(ID) ON DELETE CASCADE
+);
+
+CREATE TABLE Hotel(
+  ID SERIAL,
+  Name VARCHAR(20),
+  Adresse VARCHAR(50),
+  Telefon VARCHAR(20),
+  Sterne INT,
+  ManagerID INT,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (ManagerID) REFERENCES Mitarbeiter(ID)
+);
+
+
+
+CREATE TABLE Hotel_hat_Abteilung(
+  HotelID INT,
+  AbteilungID INT,
+  PRIMARY KEY (HotelID, AbteilungID),
+  FOREIGN KEY (HotelID) REFERENCES Hotel(ID) ON DELETE CASCADE,
+  FOREIGN Key (AbteilungID) REFERENCES Abteilung(ID)
+);
+
+CREATE TABLE Zimmer(
+  ID SERIAL,
+  Art varchar(20) CHECK (Art in ('Einzelzimmer', 'Doppelzimmer', 'Familienzimmer')),
+  HotelID INT,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (HotelID) REFERENCES Hotel(ID) ON DELETE CASCADE
+);
+
+
+CREATE TABLE belegt(
+  ZimmerID INT,
+  GastID INT,
+  sdate DATE,
+  edate DATE,
+  PRIMARY KEY (ZimmerID, GastID, sdate, edate),
+  FOREIGN Key (ZimmerID) REFERENCES Zimmer(ID) ON DELETE CASCADE,
+  FOREIGN KEY (GastID) REFERENCES Gast(ID) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Reservierung(
+  ID SERIAL,
+  Art varchar(20) CHECK (Art in ('Einzelzimmer', 'Doppelzimmer', 'Familienzimmer')),
+  PersonenAnzahl INT,
+  sdate DATE,
+  edate DATE,
+  GastID INT,
+  PRIMARY KEY (ID),
+  FOREIGN KEY(GastID) REFERENCES Gast(ID) ON DELETE CASCADE
+);
+
+INSERT INTO GAST(Name, Vorname, Adresse, Mobil)
+VALUES ('Mueller', 'Frank', 'Lindenstraße 3a', 1464513413);
+
+INSERT INTO GAST(Name, Vorname, Adresse, Mobil)
+VALUES ('Meiners', 'Elias', 'Turmstraße 15', 458290341);
+
+INSERT INTO GAST(Name, Vorname, Adresse, Mobil)
+VALUES ('Karatekin', 'Linda', 'Linastraße 15', 4582450341);
+
+INSERT INTO GAST(Name, Vorname, Adresse, Mobil)
+VALUES ('Meier', 'Linda', 'Paulstraße 15', 21420341);
+
+INSERT INTO GAST(Name, Vorname, Adresse, Mobil)
+VALUES ('Thomas', 'Maxim', 'Rigaerstr 12', 01782589630);
+
+INSERT INTO Abteilung(Name)
+VALUES ('Gastronomie');
+
+INSERT INTO Abteilung(Name)
+VALUES ('Reinigung');
+
+INSERT INTO Abteilung(Name)
+VALUES ('Verwaltung');
+
+INSERT INTO Abteilung(Name)
+VALUES ('Rezeption');
+
+INSERT INTO Mitarbeiter(Name, Vorname, Adresse, Mobil, Position, AbteilungID)
+VALUES ('Jackson', 'Paul', 'Lindenstraße 30', 1454513413, 'Kellner', 1);
+
+INSERT INTO Mitarbeiter(Name, Vorname, Adresse, Mobil, Position, AbteilungID)
+VALUES ('Jackson', 'Samuel', 'Pfeilstraße 124', 534323413, 'Reiningungskraft', 2);
+
+INSERT INTO Mitarbeiter(Name, Vorname, Adresse, Mobil, Position, AbteilungID)
+VALUES ('Vogel', 'Maria', 'Tusnelda-Alee 140', 34134231, 'Manager', 3);
+
+INSERT INTO Mitarbeiter(Name, Vorname, Adresse, Mobil, Position, AbteilungID)
+VALUES ('Jackson', 'Tim', 'Lindenstraße 24', 1454513413, 'Empfang', 4);
+
+INSERT INTO Mitarbeiter(Name, Vorname, Adresse, Mobil, Position, AbteilungID)
+VALUES ('Jackson', 'Max', 'Lindenstraße 22', 01795487982, 'Empfang', 4);
+
+INSERT INTO Hotel(Name, Adresse, Telefon, Sterne, ManagerID)
+VALUES ('Delphin', 'Lindenstraße 30 IST Türkei', 1454513413, 3, 3);
+
+INSERT INTO Hotel(Name, Adresse, Telefon, Sterne, ManagerID)
+VALUES ('Caeser Palace', 'Las Vegas USA', 57563464, 5, 3);
+
+INSERT INTO Hotel(Name, Adresse, Telefon, Sterne, ManagerID)
+VALUES ('Waldorf Astoria', 'Berlin Deutschland', 5756155246, 4, 3);
+
+INSERT INTO Hotel(Name, Adresse, Telefon, Sterne, ManagerID)
+VALUES ('Hotel Adlon', 'Berlin Deutschland', 5425254, 1, 3);
+
+
+INSERT INTO Hotel_hat_Abteilung(HotelID, AbteilungID)
+VALUES (3,3);
+INSERT INTO Hotel_hat_Abteilung(HotelID, AbteilungID)
+VALUES (4,3);
+INSERT INTO Hotel_hat_Abteilung(HotelID, AbteilungID)
+VALUES (1,3);
+INSERT INTO Hotel_hat_Abteilung(HotelID, AbteilungID)
+VALUES (2,3);
+INSERT INTO Hotel_hat_Abteilung(HotelID, AbteilungID)
+VALUES (1,2);
+INSERT INTO Hotel_hat_Abteilung(HotelID, AbteilungID)
+VALUES (2,1);
+
+INSERT INTO Zimmer(Art, HotelID)
+VALUES ('Einzelzimmer', 1);
+INSERT INTO Zimmer(Art, HotelID)
+VALUES ('Einzelzimmer', 2);
+INSERT INTO Zimmer(Art, HotelID)
+VALUES ('Doppelzimmer', 4);
+INSERT INTO Zimmer(Art, HotelID)
+VALUES ('Familienzimmer', 4);
+INSERT INTO Zimmer(Art, HotelID)
+VALUES ('Einzelzimmer', 2);
+INSERT INTO Zimmer(Art, HotelID)
+VALUES ('Einzelzimmer', 2);	
+
+
+INSERT INTO belegt(ZimmerID, GastID, sdate, edate)
+VALUES (1,1,'2019-06-16','2019-06-20');
+INSERT INTO belegt(ZimmerID, GastID, sdate, edate)
+VALUES (3,1,'2016-06-16','2019-06-20');
+INSERT INTO belegt(ZimmerID, GastID, sdate, edate)
+VALUES (4,3,'2019-02-16','2019-02-28');
+INSERT INTO belegt(ZimmerID, GastID, sdate, edate)
+VALUES (2,2,'2019-05-16','2019-06-20');
+
+INSERT INTO Reservierung(Art, PersonenAnzahl, sdate, edate, GastID)
+VALUES ('Einzelzimmer', 1, '2019-08-16', '2019-09-20', 1);
+INSERT INTO Reservierung(Art, PersonenAnzahl, sdate, edate, GastID)
+VALUES ('Familienzimmer', 4,'2020-08-01','2020-08-10', 2);
+INSERT INTO Reservierung(Art, PersonenAnzahl, sdate, edate, GastID)
+VALUES ('Doppelzimmer', 2, '2019-10-16','2019-10-22', 2);
+INSERT INTO Reservierung(Art, PersonenAnzahl, sdate, edate, GastID)
+VALUES ('Einzelzimmer', 1, '2019-12-31','2020-01-01', 4);

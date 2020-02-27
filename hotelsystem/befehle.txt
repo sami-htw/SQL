@@ -1,0 +1,51 @@
+
+
+a)-Welche Gäste belegen keine Zimmer ?
+
+select * from gast g2,((select id from gast g)EXCEPT (select gastid AS id from belegt b)) AS tmp 
+where g2.id=tmp.id;
+
+
+b)-Welche Gäste sind im Hotel Delphin ?
+
+select g.id ,g.name, g.vorname ,h.name, z.id AS zimmernummer FROM gast g ,hotel h, belegt b, zimmer z 
+where g.id=b.gastid AND z.id=h.id AND h.name ='Delphin';
+
+- Welche Mitarbeiter arbeiten in der Reinigung ?
+
+select * from mitarbeiter m JOIN abteilung a ON m.abteilungid=a.id 
+where a.name ='Reinigung';
+
+
+c)-Alle Mitarbeiter , die nicht in der Reinigung arbeiten?
+
+select * FROM mitarbeiter m 
+WHERE m.abteilungid NOT IN (select a.id from abteilung a where a.name='Reinigung');
+
+- Alle Gäste ,die ein FamilienZimmer belegt haben?
+
+ select * from gast g ,belegt b, zimmer z WHERE g.id=b.gastid AND z.id=b.zimmerid AND z.art IN ('Familienzimmer');
+
+d) Wie viele Reservierungen hat den Gast gemacht ?
+
+
+select g.name ,g.vorname ,count(*) AS Anzahl from gast g ,reservierung r where g.id=r.gastid GROUP BY name ,vorname;
+
+
+
+
+-Für wieviele Personen reserviert der Gast durchschnittlich ?
+
+select g.id ,g.name ,g.vorname ,avg (personenanzahl) FROM gast g ,reservierung r 
+WHERE g.id=r.gastid GROUP BY g.id,g.name,g.vorname;
+
+
+e) Hotels die mindistens 3 Einzelzimmer besitzen ?
+
+select h.name ,count(*) FROM hotel h ,zimmer z where h.id=z.hotelid AND z.art='Einzelzimmer' GROUP BY h.name HAVING count (*) >=3;
+
+- Nachname ,der mindestens 3 Mitarbeiter Teilen?
+
+HotelSystem=# select m1.name ,count (*) FROM mitarbeiter AS m1,mitarbeiter AS m2 WHERE m1.name =m2.name AND m1.id = m2.id GROUP BY m1.name HAVING count (*) >=3;
+
+

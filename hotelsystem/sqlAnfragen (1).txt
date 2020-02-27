@@ -1,0 +1,66 @@
+-- a
+
+-- Welche Gäste belegen keine Zimmer?
+SELECT *
+FROM Gast as g2,
+((SELECT ID FROM Gast)
+EXCEPT
+(SELECT GastID as ID FROM belegt)) as tmp
+WHERE g2.ID = tmp.ID;
+
+--b
+
+-- Welche Gäste sind im Hotel Delphin?
+SELECT Gast.ID as GastID,Gast.Name, Gast.Vorname, Hotel.Name as HotelName, Zimmer.ID as Zimmernummer
+FROM Gast, Hotel, belegt, Zimmer
+WHERE Gast.ID = belegt.GastID and Zimmer.ID = Hotel.ID and Hotel.Name = 'Delphin';
+
+-- Welche Mitarbeiter arbeiten in der Reinigung?
+SELECT*
+FROM Mitarbeiter Join Abteilung ON Mitarbeiter.AbteilungID = Abteilung.ID
+WHERE Abteilung.Name = 'Reinigung';
+
+-- c
+
+-- Alle Mitarbeiter die nicht in der Reinigung arbeiten
+SELECT *
+FROM Mitarbeiter
+WHERE Mitarbeiter.AbteilungID NOT IN (SELECT Abteilung.ID FROM Abteilung WHERE Abteilung.Name = 'Reinigung');
+
+-- Alle Gäste die ein Familien Zimmer belegen.
+
+SELECT *
+FROM Gast, belegt, Zimmer
+WHERE Gast.ID = belegt.GastID and Zimmer.ID = belegt.ZimmerID and Zimmer.Art IN ('Familienzimmer');
+
+
+-- d
+
+-- Wieviele Reservierungen hat ein Gast gemacht
+SELECT name, vorname, count(*) as Anzahl
+FROM Gast, Reservierung
+WHERE Gast.ID = Reservierung.GastID
+GROUP BY name, vorname;
+
+-- Für wieviel Personen reserviert der Gast durchschnittlich?
+SELECT Gast.ID, name, vorname, avg(PersonenAnzahl)
+FROM Gast, Reservierung
+WHERE Gast.ID = Reservierung.GastID
+GROUP BY Gast.ID, name, vorname;
+
+-- e
+
+-- Nachnamen die mindestens 3 Mitarbeiter teilen?
+SELECT m1.name ,count(*)
+FROM Mitarbeiter as m1, Mitarbeiter as m2
+WHERE m1.Name = m2.Name and m1.ID = m2.ID
+GROUP BY m1.name
+HAVING count(*) >= 3;
+
+
+-- Hotels die mindestens 3 Einzelzimmer besitzen
+SELECT Hotel.Name, count(*)
+FROM Hotel, Zimmer
+WHERE Hotel.ID = Zimmer.HotelID and Zimmer.Art = 'Einzelzimmer'
+GROUP BY Hotel.Name
+HAVING count(*) >=3;
